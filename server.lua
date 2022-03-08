@@ -205,16 +205,17 @@ RewardItems = {
 }
 
 RegisterNetEvent('cad-chopshop:recievereward', function(rarevalue)	
-	local Player = QBCore.Functions.GetPlayer(source)
+	local src = source
+	local Player = QBCore.Functions.GetPlayer(src)
 	local amount = math.random(3500, 6500)
     if Player ~= nil then	        
-        TriggerClientEvent('QBCore:Notify', source, 'You received $' .. amount .. ' for this hot vehicle', 'success')
+        TriggerClientEvent('QBCore:Notify', src, 'You received $' .. amount .. ' for this hot vehicle', 'success')
         if rarevalue == "rare1" then        
             Player.Functions.AddItem("pixellaptop", 1)
-            TriggerClientEvent('QBCore:Notify', source, 'Found a Laptop', 'success')        
+            TriggerClientEvent('QBCore:Notify', src, 'Found a Laptop', 'success')        
         elseif rarevalue == "rare2" then
             Player.Functions.AddItem("specialcard", 1)
-            TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items["specialcard"], 'add')
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items["specialcard"], 'add')
         elseif rarevalue == "normal" then
             Player.Functions.AddMoney("cash",amount)	
             for i = 1, math.random(3,6), 1 do
