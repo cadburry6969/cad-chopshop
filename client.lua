@@ -20,17 +20,19 @@ RegisterNetEvent('cad-chopshop:notifyOwner', function(x, y, z, randomVeh)
 	PlaySoundFrontend(-1, "Event_Start_Text", "GTAO_FM_Events_Soundset", 0)
 	randomVeh = randomVeh:gsub("^%l", string.upper)
 	TriggerEvent('chat:addMessage', {
-		template = '<div class="chat-message twitch"><i class="fas fa-door-open"></i> <b><span style="color: #7d7d7d">{0}</span>&nbsp;</b><div style="margin-top: 5px; font-weight: 300;">{1}</div></div>',
-		args = { "Chopshop", "Hot vehicle " .. randomVeh .. " available at " .. zone .. " on " .. street .. " with plate number: " .. HotVehPlate }
-	})	
+		color = { 0, 0, 255},
+		multiline = true,
+		args = {"Chopshop", "Hot vehicle " .. randomVeh .. " available at " .. zone .. " on " .. street .. " with plate number: " .. HotVehPlate}
+    	})
 end)
 
 RegisterNetEvent('cad-chopshop:informClients', function()	
 	PlaySoundFrontend(-1, "Event_Start_Text", "GTAO_FM_Events_Soundset", 0)
 	TriggerEvent('chat:addMessage', {
-		template = '<div class="chat-message twitch"><i class="fas fa-door-open"></i> <b><span style="color: #7d7d7d">{0}</span>&nbsp;</b><div style="margin-top: 5px; font-weight: 300;">{1}</div></div>',
-		args = { "Chopshop", 'The hot vehicle is no longer needed. Wait for another hot vehicle'}
-	})	
+		color = { 0, 0, 255},
+		multiline = true,
+		args = {"Chopshop", "The hot vehicle is no longer needed. Wait for another hot vehicle"}
+    	})	
 end)
 
 RegisterNetEvent('cad-chopshop:GetHotVehicleData', function(vehicle, plate)
