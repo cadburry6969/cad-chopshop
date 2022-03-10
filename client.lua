@@ -62,17 +62,24 @@ end
 -- Threads
 
 CreateThread(function()
-	exports['qb-target']:AddTargetModel('g_m_y_mexgoon_03', {
-		options = {
-			{ 
-				type = "client",
+	exports['qb-target']:SpawnPed({
+		model = 'g_m_y_mexgoon_03',
+		coords = vector4(ChopShopPed.x, ChopShopPed.y, ChopShopPed.z, ChopShopPed.h),
+		minusOne = true,
+		freeze = true,
+		invincible = true,
+		blockevents = true,		
+		scenario = 'WORLD_HUMAN_SMOKING', 
+		options = { 
+			{
+				type = "client", 
 				event = "cad-chopshop:HowToMsg",
-				icon = "fa fa-clipboard",
-				label = "How chop?",
-			},
+				icon = 'fa fa-clipboard',
+				label = 'Chopshop'
+			}
 		},
-		distance = 1.5 
-	})
+		distance = 1.5, 	
+	  })
 end)
 
 CreateThread(function()
