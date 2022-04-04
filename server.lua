@@ -95,7 +95,7 @@ local randomLocations = {
     vector3(-622.68, 201.27, 71.13),
 }
 
-local randomModels = {"fugitive","surge","sultan","asea","premier", "baller", "blista", "panto", "blista3", "blista2", "prairie", "rhapsody", "exempler", "cogcabrio", "felon", "oracle", "sentinel", "blade", "buccaneer", "chino", "dominator", "dukes", "faction", "gauntlet", "moonbeam", "ratloader", "stalion", "tampa", "voodoo", "sandking", "rancherxl", "xls", "rocoto", "serrano", "cognoscenti", "emperor", "ingot", "regina", "surge", "primo", "washington", "comet", "carbonizzare", "banshee", "coquette", "futo", "jester", "massacro", "ninef", "schafter", "adder", "infernus", "voltic", "vacca", "sadler", "bison"}
+local randomModels = {"fugitive","surge","sultan","asea","premier", "baller", "blista", "panto", "prairie", "rhapsody", "cogcabrio", "felon", "oracle", "sentinel", "blade", "buccaneer", "chino", "dominator", "dukes", "faction", "gauntlet", "moonbeam", "ratloader", "stalion", "tampa", "voodoo", "sandking", "rancherxl", "xls", "rocoto", "serrano", "cognoscenti", "emperor", "ingot", "regina", "surge", "primo", "comet", "carbonizzare", "banshee", "coquette", "futo", "jester", "massacro", "ninef", "schafter", "adder", "infernus", "voltic", "vacca", "sadler", "bison"}
 
 -- Functions
 
@@ -116,7 +116,6 @@ end
 -- Loops
 
 CreateThread(function()
-    print("Chopshop made for Indian Ultra RP by Cadburry#7547")
 	while true do
 		Wait(1000)   
         if not inProgress then     
@@ -136,7 +135,7 @@ CreateThread(function()
                         TriggerClientEvent('cad-chopshop:notifyOwner', Players[i], randomLoc.x, randomLoc.y, randomLoc.z, randomVeh)                        
                     end
                 end        
-                CooldownTimer(30)          
+                CooldownTimer(20)          
             end        
         end
 	end
@@ -176,6 +175,7 @@ RegisterNetEvent('cad-chopshop:vehicleChopped', function()
             randomVeh = nil
             currentplate = nil         
             chopvehicle = nil   
+	    cooldown = 25000 -- 25 secs after chop will give new vehicle
         end
     end
 end)
@@ -211,11 +211,10 @@ RegisterNetEvent('cad-chopshop:recievereward', function(rarevalue)
     if Player ~= nil then	        
         TriggerClientEvent('QBCore:Notify', src, 'You received $' .. amount .. ' for this hot vehicle', 'success')
         if rarevalue == "rare1" then        
-            Player.Functions.AddItem("pixellaptop", 1)
+            Player.Functions.AddItem("tunerlaptop", 1)
             TriggerClientEvent('QBCore:Notify', src, 'Found a Laptop', 'success')        
         elseif rarevalue == "rare2" then
-            Player.Functions.AddItem("specialcard", 1)
-            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items["specialcard"], 'add')
+            Player.Functions.AddItem("specialcard", 1)    -- add your items  
         elseif rarevalue == "normal" then
             Player.Functions.AddMoney("cash",amount)	
             for i = 1, math.random(3,6), 1 do
