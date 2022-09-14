@@ -30,4 +30,4 @@ Chopshop with radio which provides you hotvehicle on time to time. just have rad
 
 # Support
 
-https://discord.gg/9tyjPkA6nd
+https://discord.gg/qxGPARNwNP
