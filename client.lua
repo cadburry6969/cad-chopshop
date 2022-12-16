@@ -3,7 +3,9 @@ local QBCore = exports["qb-core"]:GetCoreObject()
 
 local HotVehPlate = nil
 local HotVehModel = nil
-local ChopShop = {x = 2340.49, y = 3052.32, z = 48.15}
+local ChopShop = {
+	vector3(2340.49, 3052.32, 48.15),
+}
 local ChopShopPed = {x = 2342.21, y = 3055.63, z = 47.2, h = 162.86}
 local ChopCds = {}
 
@@ -89,76 +91,82 @@ CreateThread(function()
 		Wait(0)		
 		local inRange = false	
 		local pPed = PlayerPedId()
-		local coords = GetEntityCoords(pPed)		
-		local distance = GetDistanceBetweenCoords(coords, ChopShop.x, ChopShop.y, ChopShop.z, true)
-		if distance < 4 then
-			if IsPedInAnyVehicle(pPed, true) then
-				inRange = true
-				local pVehicle = GetVehiclePedIsIn(pPed,false)
-				local pVehModel = GetDisplayNameFromVehicleModel(GetEntityModel(pVehicle))
-				local pPlate = GetVehicleNumberPlateText(pVehicle)										
-				ShowHelpNotification("Press ~INPUT_CONTEXT~ to chop the vehicle", true, true, 10000)
-				if IsControlJustReleased(0,  46) then
-					if (pPlate == HotVehPlate) or (pVehModel:lower() == HotVehModel) then												
-						SetVehicleDoorsLocked(pVehicle, 2)
-						SetVehicleEngineOn(pVehicle, false, false, true)
-						SetVehicleUndriveable(pVehicle, false)
-						SetVehicleDoorOpen(pVehicle, 0, false, true)
-						Wait(1000)
-						TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)	
-						SetVehicleDoorBroken(pVehicle, 0, false)
-						Wait(1000)
-						SetVehicleDoorOpen(pVehicle, 1, false, true)
-						Wait(1000)
-						TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)
-						SetVehicleDoorBroken(pVehicle, 1, false)
-						Wait(1000)
-						SetVehicleDoorOpen(pVehicle, 2, false, true)
-						Wait(1000)
-						TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)			
-						SetVehicleDoorBroken(pVehicle, 2, false)
-						Wait(1000)			
-						SetVehicleDoorOpen(pVehicle, 3, false, true)
-						Wait(1000)
-						TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)
-						SetVehicleDoorBroken(pVehicle, 3, false)
-						Wait(1000)
-						SetVehicleDoorOpen(pVehicle, 4, false, true)
-						Wait(1000)
-						TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)
-						SetVehicleDoorBroken(pVehicle, 4, false)
-						Wait(1000)
-						SetVehicleDoorOpen(pVehicle, 5, false, true)
-						Wait(1000)
-						TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)
-						SetVehicleDoorBroken(pVehicle, 5, false)
-						SetEntityAsMissionEntity(pVehicle , true, true )
-						DeleteEntity(pVehicle)
-						if (DoesEntityExist(pVehicle)) then
-							DeleteEntity(pVehicle)
-						end
-						Wait(1000)
-						local chance = math.random(1, 20)
-						if chance == 10 then
-							TriggerServerEvent('cad-chopshop:recievereward', "rare1")
-						end
-						local RareValue = math.random(1, 1000)
-						if RareValue == 500 then
-							TriggerServerEvent('cad-chopshop:recievereward', "rare2")
-						end
-						TriggerServerEvent('cad-chopshop:recievereward', "normal")
-						QBCore.Functions.Notify('The vehicle has been chopped', 'error')					
-						TriggerServerEvent('cad-chopshop:vehicleChopped')						
-						HotVehPlate = nil
-						HotVehModel = nil
-					else
-						QBCore.Functions.Notify('This is not the hot vehicle', 'error')
-					end
+		local plyCoords = GetEntityCoords(pPed)
+		local isInChopRange = false
+		for _, coord in pairs(ChopShop) do
+			local distance = GetDistanceBetweenCoords(plyCoords, coord.x, coord.y, coord.z, true)
+			if distance < 4 then 
+				if IsPedInAnyVehicle(pPed, true) then
+					isInChopRange = true
+					inRange = true
 				end
 			end
-		end
+		end	
+		if isInChopRange then
+			local pVehicle = GetVehiclePedIsIn(pPed,false)
+			local pVehModel = GetDisplayNameFromVehicleModel(GetEntityModel(pVehicle))
+			local pPlate = GetVehicleNumberPlateText(pVehicle)										
+			ShowHelpNotification("Press ~INPUT_CONTEXT~ to chop the vehicle", true, true, 10000)
+			if IsControlJustReleased(0,  46) then
+				if (pPlate == HotVehPlate) or (pVehModel:lower() == HotVehModel) then												
+					SetVehicleDoorsLocked(pVehicle, 2)
+					SetVehicleEngineOn(pVehicle, false, false, true)
+					SetVehicleUndriveable(pVehicle, false)
+					SetVehicleDoorOpen(pVehicle, 0, false, true)
+					Wait(1000)
+					TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)	
+					SetVehicleDoorBroken(pVehicle, 0, false)
+					Wait(1000)
+					SetVehicleDoorOpen(pVehicle, 1, false, true)
+					Wait(1000)
+					TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)
+					SetVehicleDoorBroken(pVehicle, 1, false)
+					Wait(1000)
+					SetVehicleDoorOpen(pVehicle, 2, false, true)
+					Wait(1000)
+					TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)			
+					SetVehicleDoorBroken(pVehicle, 2, false)
+					Wait(1000)			
+					SetVehicleDoorOpen(pVehicle, 3, false, true)
+					Wait(1000)
+					TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)
+					SetVehicleDoorBroken(pVehicle, 3, false)
+					Wait(1000)
+					SetVehicleDoorOpen(pVehicle, 4, false, true)
+					Wait(1000)
+					TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)
+					SetVehicleDoorBroken(pVehicle, 4, false)
+					Wait(1000)
+					SetVehicleDoorOpen(pVehicle, 5, false, true)
+					Wait(1000)
+					TriggerEvent('InteractSound_CL:PlayOnOne', 'chop', 0.4)
+					SetVehicleDoorBroken(pVehicle, 5, false)
+					SetEntityAsMissionEntity(pVehicle , true, true )
+					DeleteEntity(pVehicle)
+					if (DoesEntityExist(pVehicle)) then
+						DeleteEntity(pVehicle)
+					end
+					Wait(1000)
+					local chance = math.random(1, 20)
+					if chance == 10 then
+						TriggerServerEvent('cad-chopshop:recievereward', "rare1")
+					end
+					local RareValue = math.random(1, 1000)
+					if RareValue == 500 then
+						TriggerServerEvent('cad-chopshop:recievereward', "rare2")
+					end
+					TriggerServerEvent('cad-chopshop:recievereward', "normal")
+					QBCore.Functions.Notify('The vehicle has been chopped', 'error')					
+					TriggerServerEvent('cad-chopshop:vehicleChopped')						
+					HotVehPlate = nil
+					HotVehModel = nil
+				else
+					QBCore.Functions.Notify('This is not the hot vehicle', 'error')
+				end
+			end
+		end	
 		if not inRange then
-			Wait(1500) --  1.5secs
+			Wait(1000) --  1secs
 		end
 	end
 end)
