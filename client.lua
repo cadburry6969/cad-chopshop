@@ -6,7 +6,9 @@ local HotVehModel = nil
 local ChopShop = {
 	vector3(2340.49, 3052.32, 48.15),
 }
-local ChopShopPed = {x = 2342.21, y = 3055.63, z = 47.2, h = 162.86}
+local ChopShopPed = {
+	vector3(2342.21, 3055.63, 48.15, 162.86),
+}
 local ChopCds = {}
 
 -- Events
@@ -66,24 +68,27 @@ end
 -- Threads
 
 CreateThread(function()
-	exports['qb-target']:SpawnPed({
-		model = 'g_m_y_mexgoon_03',
-		coords = vector4(ChopShopPed.x, ChopShopPed.y, ChopShopPed.z, ChopShopPed.h),
-		minusOne = true,
-		freeze = true,
-		invincible = true,
-		blockevents = true,		
-		scenario = 'WORLD_HUMAN_SMOKING', 
-		options = { 
-			{
-				type = "client", 
-				event = "cad-chopshop:HowToMsg",
-				icon = 'fa fa-clipboard',
-				label = 'Chopshop'
-			}
-		},
-		distance = 1.5, 	
-	  })
+	for _, data in pairs(ChopShopPed) do
+		exports['qb-target']:SpawnPed({
+			model = 'g_m_y_mexgoon_03',
+			coords = vector4(data.x, data.y, data.z, data.h),
+			minusOne = true,
+			freeze = true,
+			invincible = true,
+			blockevents = true,		
+			scenario = 'WORLD_HUMAN_SMOKING', 
+			options = { 
+				{
+					type = "client", 
+					event = "cad-chopshop:HowToMsg",
+					icon = 'fa fa-clipboard',
+					label = 'Chopshop'
+				}
+			},
+			spawnNow = true,
+			distance = 1.5, 	
+		})
+	end
 end)
 
 CreateThread(function()
