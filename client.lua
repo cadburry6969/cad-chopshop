@@ -7,7 +7,7 @@ local ChopShop = {
 	vector3(2340.49, 3052.32, 48.15),
 }
 local ChopShopPed = {
-	vector3(2342.21, 3055.63, 48.15, 162.86),
+	vector4(2342.21, 3055.63, 48.15, 162.86),
 }
 local ChopCds = {}
 
@@ -71,7 +71,7 @@ CreateThread(function()
 	for _, data in pairs(ChopShopPed) do
 		exports['qb-target']:SpawnPed({
 			model = 'g_m_y_mexgoon_03',
-			coords = vector4(data.x, data.y, data.z, data.h),
+			coords = vector4(data.x, data.y, data.z, data.w),
 			minusOne = true,
 			freeze = true,
 			invincible = true,
