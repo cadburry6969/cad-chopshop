@@ -1,5 +1,6 @@
 fx_version "adamant"
 game "gta5"
+lua54 'yes'
 
 author "Cadburry#7547"
 description "ChopShop with radio which provides hot vehicles to chop"
