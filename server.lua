@@ -3,110 +3,13 @@ local QBCore = exports["qb-core"]:GetCoreObject()
 
 local cooldown = -1
 local inProgress = false
-local randomLoc, randomVeh = nil , nil
+local randomLoc, randomVeh = nil, nil
 local chopvehicle = nil
 local currentplate = nil
-local ChopItem = "chopradio"
-
-local randomLocations = {
-    vector4(-2480.9, -212.0, 17.4, 90.0),
-    vector4(-2723.4, 13.2, 15.1, 90.0),
-    vector4(-3169.6, 976.2, 15.0, 90.0),
-    vector4(-3139.8, 1078.7, 20.2, 90.0),
-    vector4(-1656.9, -246.2, 54.5, 90.0),
-    vector4(-1586.7, -647.6, 29.4, 90.0),
-    vector4(-1036.1, -491.1, 36.2, 90.0),
-    vector4(-1029.2, -475.5, 36.4, 90.0),
-    vector4(75.2, 164.9, 104.7, 90.0),
-    vector4(-534.6, -756.7, 31.6, 90.0),
-    vector4(487.2, -30.8, 88.9, 90.0),
-    vector4(-772.2, -1281.8, 4.6, 90.0),
-    vector4(-663.8, -1207.0, 10.2, 90.0),
-    vector4(719.1, -767.8, 24.9, 90.0),
-    vector4(-971.0, -2410.4, 13.3, 90.0),
-    vector4(-1067.5, -2571.4, 13.2, 90.0),
-    vector4(-619.2, -2207.3, 5.6, 90.0),
-    vector4(1192.1, -1336.9, 35.1, 90.0),
-    vector4(-432.8, -2166.1, 9.9, 90.0),
-    vector4(-451.8, -2269.3, 7.2, 90.0),
-    vector4(939.3, -2197.5, 30.5, 90.0),
-    vector4(-556.1, -1794.7, 22.0, 90.0),
-    vector4(591.7, -2628.2, 5.6, 90.0),
-    vector4(1654.5, -2535.8, 74.5, 90.0),
-    vector4(1642.6, -2413.3, 93.1, 90.0),
-    vector4(1371.3, -2549.5, 47.6, 90.0),
-    vector4(383.8, -1652.9, 37.3, 90.0),
-    vector4(27.2, -1030.9, 29.4, 90.0),
-    vector4(229.3, -365.9, 43.8, 90.0),
-    vector4(-85.8, -51.7, 61.1, 90.0),
-    vector4(-4.6, -670.3, 31.9, 90.0),
-    vector4(-111.9, 92.0, 71.1, 90.0),
-    vector4(-314.3, -698.2, 32.5, 90.0),
-    vector4(-366.9, 115.5, 65.6, 90.0),
-    vector4(-592.1, 138.2, 60.1, 90.0),
-    vector4(-1613.9, 18.8, 61.8, 90.0),
-    vector4(-1709.8, 55.1, 65.7, 90.0),
-    vector4(-521.9, -266.8, 34.9, 90.0),
-    vector4(-451.1, -333.5, 34.0, 90.0),
-    vector4(322.4, -1900.5, 25.8, 90.0),
-    vector4(-2078.76, -331.44, 12.63, 90.0),
-    vector4(-2949.47, 461.58, 14.7, 90.0),
-    vector4(-2214.0, 4238.75, 47.0, 90.0),
-    vector4(-356.99, 6067.1, 31.07, 90.0),
-    vector4(1127.82, 2648.17, 37.49, 90.0),
-    vector4(1869.78, 2557.07, 45.17, 90.0),
-    vector4(1690.12, 3288.04, 40.64, 90.0),
-    vector4(2058.21, 3887.32, 31.21, 90.0),
-    vector4(2786.06, 3463.15, 54.91, 90.0),
-    vector4(727.21, -208.16, 67.84, 90.0),
-    vector4(-327.8, -2748.6, 6.02, 90.0),
-    vector4(510.21, -3054.7, 6.07, 90.0),
-    vector4(833.76, -1271.81, 26.28, 90.0),
-    vector4(4.49, -1762.49, 29.3, 90.0),
-    vector4(380.07, -739.98, 29.29, 90.0),
-    vector4(178.47, -698.52, 33.13, 90.0),
-    vector4(225.67, -776.58, 30.77, 90.0),
-    vector4(236.73, -795.25, 30.5, 90.0),
-    vector4(-1166.15, -888.1, 14.11, 90.0),
-    vector4(-56.5, -1117.01, 26.44, 90.0),
-    vector4(282.27, -327.14, 44.92, 90.0),
-    vector4(-391.13, -122.16, 38.67, 90.0),
-    vector4(-1329.0, -396.54, 36.45, 90.0),
-    vector4(61.6, 19.35, 69.35, 90.0),
-    vector4(362.87, 277.94, 103.25, 90.0),
-    vector4(2774.65, 3471.37, 55.44, 90.0),
-    vector4(2030.43, 3166.86, 45.24, 90.0),
-    vector4(1245.01, 2713.15, 38.01, 90.0),
-    vector4(627.56, 2731.54, 41.88, 90.0),
-    vector4(1768.18, 3697.84, 34.21, 90.0),
-    vector4(2150.18, 4797.54, 41.14, 90.0),
-    vector4(2411.72, 4970.77, 46.11, 90.0),
-    vector4(907.48, -54.72, 78.76, 90.0),
-    vector4(880.41, -39.27, 78.76, 90.0),
-    vector4(-723.8, -913.2, 19.01, 90.0),
-    vector4(-1800.38, -1180.45, 13.02, 90.0),
-    vector4(-1629.1, -888.81, 9.06, 90.0),
-    vector4(-1643.01, -834.77, 9.99, 90.0),
-    vector4(-1708.75, -899.46, 7.81, 90.0),
-    vector4(-1737.96, -723.72, 10.45, 90.0),
-    vector4(-2079.03, -335.51, 13.14, 90.0),
-    vector4(-1510.41, 1490.02, 116.16, 90.0),
-    vector4(-311.28, -757.9, 33.97, 90.0),
-    vector4(-622.68, 201.27, 71.13, 90.0),
-}
-
-local randomModels = {"fugitive","surge","sultan","asea","premier", "baller", "blista", "panto", "prairie", "rhapsody", "cogcabrio", "felon", "oracle", "sentinel", "blade", "buccaneer", "chino", "dominator", "dukes", "faction", "gauntlet", "moonbeam", "ratloader", "stalion", "tampa", "voodoo", "sandking", "rancherxl", "xls", "rocoto", "serrano", "cognoscenti", "emperor", "ingot", "regina", "surge", "primo", "comet", "carbonizzare", "banshee", "coquette", "futo", "jester", "massacro", "ninef", "schafter", "adder", "infernus", "voltic", "vacca", "sadler", "bison"}
-
-local RewardItems = {
-    "metalscrap",
-    "plastic",
-    "copper",
-    "iron",
-    "aluminum",
-    "steel",
-    "glass",
-}
-
+local ChopItem = Config.ChopRadioItem
+local randomLocations = Config.RandomLocations
+local randomModels = Config.RandomVehicles
+local RewardItems = Config.RewardItems
 
 -- Functions
 
@@ -130,40 +33,36 @@ function CooldownTimer(minutes)
     end
 end
 
-function SpawnVehicle(model, coords)
-    model = type(model) == 'string' and joaat(model) or model
-    if not coords then coords = GetEntityCoords(ped) end
-    local veh = Citizen.InvokeNative(0xDD75460A, model, coords.x, coords.y, coords.z, coords.w, true, true)
-    while not DoesEntityExist(veh) do Wait(0) end
-    return veh
-end
-
 -- Loops
 
 CreateThread(function()
-	while true do
-		Wait(5000)
-        if not inProgress then     
+    while true do
+        Wait(5000)
+        if not inProgress then
             if randomLoc == nil and randomVeh == nil and currentplate == nil then
                 randomLoc = randomLocations[math.random(1, #randomLocations)]
                 randomVeh = randomModels[math.random(1, #randomModels)]
-                currentplate = tostring(math.random(11111111,99999999))
+                currentplate = tostring(math.random(11111111, 99999999))
                 inProgress = true
                 Wait(1000)
-                chopvehicle = SpawnVehicle(randomVeh, randomLoc)
+                chopvehicle = Citizen.InvokeNative(0xDD75460A, randomVeh, randomLoc.x, randomLoc.y, randomLoc.z,
+                    randomLoc.w, true, true)
+                while not DoesEntityExist(chopvehicle) do Wait(0) end
                 SetVehicleNumberPlateText(chopvehicle, currentplate)
+                print(tostring("Vehicle: [" .. randomVeh .. "] | Coords: " .. randomLoc .. " | Plate: " .. currentplate))
                 local Players = QBCore.Functions.GetPlayers()
-                for i=1, #Players, 1 do
+                for i = 1, #Players, 1 do
                     local Player = QBCore.Functions.GetPlayer(Players[i])
                     if Player.Functions.GetItemByName(ChopItem) then
-                        TriggerClientEvent("cad-chopshop:GetHotVehicleData", Players[i], randomVeh, currentplate)                    
-                        TriggerClientEvent('cad-chopshop:notifyOwner', Players[i], randomLoc.x, randomLoc.y, randomLoc.z, randomVeh)                        
+                        TriggerClientEvent("cad-chopshop:GetHotVehicleData", Players[i], randomVeh, currentplate)
+                        TriggerClientEvent('cad-chopshop:notifyOwner', Players[i], randomLoc.x, randomLoc.y, randomLoc.z,
+                            randomVeh)
                     end
                 end
                 CooldownTimer(20)
             end
         end
-	end
+    end
 end)
 
 -- Create Usable Items
@@ -173,9 +72,9 @@ QBCore.Functions.CreateUseableItem(ChopItem, function(source)
     if randomLoc and randomVeh then
         TriggerClientEvent("cad-chopshop:GetHotVehicleData", src, randomVeh, currentplate)
         TriggerClientEvent('cad-chopshop:notifyOwner', src, randomLoc.x, randomLoc.y, randomLoc.z, randomVeh)
-	else
+    else
         TriggerClientEvent('QBCore:Notify', src, 'You will be informed if there is another hot vehicle needed')
-	end
+    end
 end)
 
 -- Events
@@ -190,9 +89,9 @@ RegisterNetEvent('cad-chopshop:clientjoined', function()
     end
 end)
 
-RegisterNetEvent('cad-chopshop:vehicleChopped', function()	
-	local Players = QBCore.Functions.GetPlayers()
-    for i=1, #Players, 1 do
+RegisterNetEvent('cad-chopshop:vehicleChopped', function()
+    local Players = QBCore.Functions.GetPlayers()
+    for i = 1, #Players, 1 do
         local Player = QBCore.Functions.GetPlayer(Players[i])
         if Player.Functions.GetItemByName(ChopItem) then
             TriggerClientEvent('cad-chopshop:informClients', Players[i])
@@ -200,14 +99,14 @@ RegisterNetEvent('cad-chopshop:vehicleChopped', function()
             randomVeh = nil
             currentplate = nil
             chopvehicle = nil
-	    cooldown = 25000 -- 25 secs after chop will give new vehicle
+            cooldown = 25000 -- 25 secs after chop will give new vehicle
         end
     end
 end)
 
 RegisterNetEvent('cad-chopshop:timeOver', function()
-    local Players = QBCore.Functions.GetPlayers()    
-    for i=1, #Players, 1 do
+    local Players = QBCore.Functions.GetPlayers()
+    for i = 1, #Players, 1 do
         local Player = QBCore.Functions.GetPlayer(Players[i])
         if Player.Functions.GetItemByName(ChopItem) then
             TriggerClientEvent('cad-chopshop:informClients', Players[i])
@@ -219,22 +118,22 @@ RegisterNetEvent('cad-chopshop:timeOver', function()
     end
 end)
 
-RegisterNetEvent('cad-chopshop:recievereward', function(rarevalue)	
-	local src = source
-	local Player = QBCore.Functions.GetPlayer(src)
-	local amount = math.random(3500, 6500)
-    if Player ~= nil then	        
+RegisterNetEvent('cad-chopshop:recievereward', function(rarevalue)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local amount = math.random(3500, 6500)
+    if Player ~= nil then
         TriggerClientEvent('QBCore:Notify', src, 'You received $' .. amount .. ' for this hot vehicle', 'success')
-        if rarevalue == "rare1" then        
+        if rarevalue == "rare1" then
             Player.Functions.AddItem("tunerlaptop", 1)
-            TriggerClientEvent('QBCore:Notify', src, 'Found a Laptop', 'success')        
+            TriggerClientEvent('QBCore:Notify', src, 'Found a Laptop', 'success')
         elseif rarevalue == "rare2" then
-            Player.Functions.AddItem("specialcard", 1)    -- add your items  
+            Player.Functions.AddItem("specialcard", 1) -- add your items
         elseif rarevalue == "normal" then
-            Player.Functions.AddMoney("cash",amount)
-            for i = 1, math.random(3,6), 1 do
+            Player.Functions.AddMoney("cash", amount)
+            for i = 1, math.random(3, 6), 1 do
                 local item = RewardItems[math.random(1, #RewardItems)]
-                local amount = math.random(20,50)
+                local amount = math.random(20, 50)
                 Player.Functions.AddItem(item, amount)
                 TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], 'add', amount)
             end
