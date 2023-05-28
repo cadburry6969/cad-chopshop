@@ -5,7 +5,7 @@ local HotVehPlate = nil
 local HotVehModel = nil
 local ChopShop = Config.ChopShopLocations
 local ChopShopPed = Config.ChopShopPeds
-local chopTable = {}
+local chopTable = nil
 
 -- Events
 
@@ -13,10 +13,12 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 	TriggerServerEvent("cad-chopshop:clientjoined")
 end)
 
-RegisterNetEvent('cad-chopshop:notifyOwner', function(x, y, z, randomVeh)
+RegisterNetEvent('cad-chopshop:notifyOwner', function(x, y, z, randomVeh, currentplate)
+	HotVehModel = randomVeh
+	HotVehPlate = currentplate
 	local street = GetStreetNameFromHashKey(GetStreetNameAtCoord(x, y, z))
 	local zone = GetLabelText(GetNameOfZone(x, y, z))
-	chopTable = { x = x, y = y }
+	chopTable = vector2(x, y)
 	PlaySoundFrontend( -1, "Event_Start_Text", "GTAO_FM_Events_Soundset", 0)
 	randomVeh = randomVeh:gsub("^%l", string.upper)
 	TriggerEvent('chat:addMessage', {
@@ -27,6 +29,8 @@ RegisterNetEvent('cad-chopshop:notifyOwner', function(x, y, z, randomVeh)
 end)
 
 RegisterNetEvent('cad-chopshop:informClients', function()
+	HotVehPlate = nil
+	HotVehModel = nil
 	PlaySoundFrontend( -1, "Event_Start_Text", "GTAO_FM_Events_Soundset", 0)
 	TriggerEvent('chat:addMessage', {
 		color = { 0, 0, 255 },
@@ -35,14 +39,9 @@ RegisterNetEvent('cad-chopshop:informClients', function()
 	})
 end)
 
-RegisterNetEvent('cad-chopshop:GetHotVehicleData', function(vehicle, plate)
-	HotVehModel = vehicle
-	HotVehPlate = plate
-end)
-
 RegisterNetEvent('cad-chopshop:HowToMsg', function()
 	QBCore.Functions.Notify("Bring the hot vehicle in front me and you will know.", 'success', 5000)
-	if chopTable ~= nil then
+	if chopTable then
 		SetNewWaypoint(chopTable.x, chopTable.y)
 	end
 end)
@@ -95,7 +94,7 @@ CreateThread(function()
 		local plyCoords = GetEntityCoords(pPed)
 		local isInChopRange = false
 		for _, coord in pairs(ChopShop) do
-			local distance = GetDistanceBetweenCoords(plyCoords, coord.x, coord.y, coord.z, true)
+			local distance = #(plyCoords-vector3(coord.x, coord.y, coord.z))
 			if distance < 4 then
 				if IsPedInAnyVehicle(pPed, true) then
 					isInChopRange = true

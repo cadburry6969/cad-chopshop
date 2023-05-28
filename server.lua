@@ -14,7 +14,7 @@ local RewardItems = Config.RewardItems
 -- Functions
 
 function CooldownTimer(minutes)
-    cooldown = minutes * 60 * 1000
+    cooldown = minutes * 60
     while cooldown > 0 do
         Wait(1000)
         cooldown = cooldown - 1000
@@ -42,24 +42,23 @@ CreateThread(function()
             if randomLoc == nil and randomVeh == nil and currentplate == nil then
                 randomLoc = randomLocations[math.random(1, #randomLocations)]
                 randomVeh = randomModels[math.random(1, #randomModels)]
-                currentplate = tostring(math.random(11111111, 99999999))
                 inProgress = true
                 Wait(1000)
-                chopvehicle = Citizen.InvokeNative(0xDD75460A, randomVeh, randomLoc.x, randomLoc.y, randomLoc.z,
-                    randomLoc.w, true, true)
+                local nativeHash = GetHashKey("CREATE_AUTOMOBILE")
+                chopvehicle = Citizen.InvokeNative(nativeHash, GetHashKey(randomVeh), randomLoc.x, randomLoc.y, randomLoc.z, randomLoc.w, true, true)
                 while not DoesEntityExist(chopvehicle) do Wait(0) end
+                currentplate = QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(3)
                 SetVehicleNumberPlateText(chopvehicle, currentplate)
-                print(tostring("Vehicle: [" .. randomVeh .. "] | Coords: " .. randomLoc .. " | Plate: " .. currentplate))
+                SetVehicleDoorsLocked(chopvehicle, 2)
+                print(tostring("Vehicle: " .. randomVeh .. " | Coords: " .. randomLoc .. " | Plate: " .. currentplate))
                 local Players = QBCore.Functions.GetPlayers()
                 for i = 1, #Players, 1 do
                     local Player = QBCore.Functions.GetPlayer(Players[i])
                     if Player.Functions.GetItemByName(ChopItem) then
-                        TriggerClientEvent("cad-chopshop:GetHotVehicleData", Players[i], randomVeh, currentplate)
-                        TriggerClientEvent('cad-chopshop:notifyOwner', Players[i], randomLoc.x, randomLoc.y, randomLoc.z,
-                            randomVeh)
+                        TriggerClientEvent('cad-chopshop:notifyOwner', Players[i], randomLoc.x, randomLoc.y, randomLoc.z, randomVeh, currentplate)
                     end
                 end
-                CooldownTimer(20)
+                CooldownTimer(Config.Cooldown)
             end
         end
     end
@@ -69,9 +68,8 @@ end)
 
 QBCore.Functions.CreateUseableItem(ChopItem, function(source)
     local src = source
-    if randomLoc and randomVeh then
-        TriggerClientEvent("cad-chopshop:GetHotVehicleData", src, randomVeh, currentplate)
-        TriggerClientEvent('cad-chopshop:notifyOwner', src, randomLoc.x, randomLoc.y, randomLoc.z, randomVeh)
+    if randomLoc and randomVeh and currentplate then
+        TriggerClientEvent('cad-chopshop:notifyOwner', src, randomLoc.x, randomLoc.y, randomLoc.z, randomVeh, currentplate)
     else
         TriggerClientEvent('QBCore:Notify', src, 'You will be informed if there is another hot vehicle needed')
     end
@@ -82,9 +80,8 @@ end)
 RegisterNetEvent('cad-chopshop:clientjoined', function()
     local Player = QBCore.Functions.GetPlayer(source)
     if Player.Functions.GetItemByName(ChopItem) then
-        if randomLoc and randomVeh then
-            TriggerClientEvent("cad-chopshop:GetHotVehicleData", source, randomVeh, currentplate)
-            TriggerClientEvent('cad-chopshop:notifyOwner', source, randomLoc.x, randomLoc.y, randomLoc.z, randomVeh)
+        if randomLoc and randomVeh and currentplate then
+            TriggerClientEvent('cad-chopshop:notifyOwner', source, randomLoc.x, randomLoc.y, randomLoc.z, randomVeh, currentplate)
         end
     end
 end)
@@ -95,13 +92,12 @@ RegisterNetEvent('cad-chopshop:vehicleChopped', function()
         local Player = QBCore.Functions.GetPlayer(Players[i])
         if Player.Functions.GetItemByName(ChopItem) then
             TriggerClientEvent('cad-chopshop:informClients', Players[i])
-            randomLoc = nil
-            randomVeh = nil
-            currentplate = nil
-            chopvehicle = nil
-            cooldown = 25000 -- 25 secs after chop will give new vehicle
         end
     end
+    randomLoc = nil
+    randomVeh = nil
+    currentplate = nil
+    chopvehicle = nil
 end)
 
 RegisterNetEvent('cad-chopshop:timeOver', function()
@@ -110,12 +106,12 @@ RegisterNetEvent('cad-chopshop:timeOver', function()
         local Player = QBCore.Functions.GetPlayer(Players[i])
         if Player.Functions.GetItemByName(ChopItem) then
             TriggerClientEvent('cad-chopshop:informClients', Players[i])
-            randomLoc = nil
-            randomVeh = nil
-            currentplate = nil
-            chopvehicle = nil
         end
     end
+    randomLoc = nil
+    randomVeh = nil
+    currentplate = nil
+    chopvehicle = nil
 end)
 
 RegisterNetEvent('cad-chopshop:recievereward', function(rarevalue)

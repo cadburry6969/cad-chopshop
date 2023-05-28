@@ -19,6 +19,8 @@ Config.RewardItems = {
     "glass",
 }
 
+Config.Cooldown = 20
+
 Config.RandomVehicles = { "fugitive", "surge", "sultan", "asea", "premier", "baller", "blista", "panto", "prairie",
     "rhapsody", "cogcabrio", "felon", "oracle", "sentinel", "blade", "buccaneer", "chino", "dominator", "dukes",
     "faction", "gauntlet", "moonbeam", "ratloader", "stalion", "tampa", "voodoo", "sandking", "rancherxl", "xls",
