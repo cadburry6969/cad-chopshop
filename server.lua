@@ -17,7 +17,7 @@ function CooldownTimer(minutes)
     cooldown = minutes * 60
     while cooldown > 0 do
         Wait(1000)
-        cooldown = cooldown - 1000
+        cooldown = cooldown - 1
         if cooldown <= 0 then
             cooldown = -1
             inProgress = false
