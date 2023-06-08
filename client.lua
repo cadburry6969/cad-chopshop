@@ -16,7 +16,8 @@ end)
 RegisterNetEvent('cad-chopshop:notifyOwner', function(x, y, z, randomVeh, currentplate)
 	HotVehModel = randomVeh
 	HotVehPlate = currentplate
-	local street = GetStreetNameFromHashKey(GetStreetNameAtCoord(x, y, z))
+	local streetName, crossingRoad = GetStreetNameAtCoord(x, y, z)
+	local street = string.format('%s - %s', GetStreetNameFromHashKey(streetName), GetStreetNameFromHashKey(crossingRoad))
 	local zone = GetLabelText(GetNameOfZone(x, y, z))
 	chopTable = vector2(x, y)
 	PlaySoundFrontend( -1, "Event_Start_Text", "GTAO_FM_Events_Soundset", 0)
