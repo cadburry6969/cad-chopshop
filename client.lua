@@ -105,10 +105,11 @@ CreateThread(function()
 		end
 		if isInChopRange then
 			local pVehicle = GetVehiclePedIsIn(pPed, false)
+			local pSeat = (GetPedInVehicleSeat(pVehicle, -1) == pPed)
 			local pVehModel = GetDisplayNameFromVehicleModel(GetEntityModel(pVehicle))
 			local pPlate = GetVehicleNumberPlateText(pVehicle)
 			ShowHelpNotification("Press ~INPUT_CONTEXT~ to chop the vehicle", true, true, 10000)
-			if IsControlJustReleased(0, 46) then
+			if IsControlJustReleased(0, 46) and pSeat then
 				if (pPlate == HotVehPlate) or (pVehModel:lower() == HotVehModel) then
 					SetVehicleDoorsLocked(pVehicle, 2)
 					SetVehicleEngineOn(pVehicle, false, false, true)
@@ -145,9 +146,7 @@ CreateThread(function()
 					SetEntityAsMissionEntity(pVehicle, true, true)
 					DeleteEntity(pVehicle)
 					if DoesEntityExist(pVehicle) then DeleteEntity(pVehicle) end
-					QBCore.Functions.Notify('The vehicle has been chopped', 'error')
-					TriggerServerEvent('cad-chopshop:vehicleChopped')
-					Wait(1000)
+					Wait(math.random(500, 2000))
 					local chance = math.random()
 					if chance < 0.15 then
 						TriggerServerEvent('cad-chopshop:recievereward', "rare1")
@@ -156,6 +155,8 @@ CreateThread(function()
 					else
 						TriggerServerEvent('cad-chopshop:recievereward', "normal")
 					end
+					QBCore.Functions.Notify('The vehicle has been chopped', 'error')
+					TriggerServerEvent('cad-chopshop:vehicleChopped')
 					HotVehPlate = nil
 					HotVehModel = nil
 				else
