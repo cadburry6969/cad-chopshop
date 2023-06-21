@@ -118,7 +118,7 @@ RegisterNetEvent('cad-chopshop:recievereward', function(rarevalue)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     local amount = math.random(3500, 6500)
-    if Player ~= nil then
+    if Player and randomLoc and randomVeh and currentplate then
         TriggerClientEvent('QBCore:Notify', src, 'You received $' .. amount .. ' for this hot vehicle', 'success')
         if rarevalue == "rare1" then
             Player.Functions.AddItem("tunerlaptop", 1)

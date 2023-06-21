@@ -144,21 +144,18 @@ CreateThread(function()
 					SetVehicleDoorBroken(pVehicle, 5, false)
 					SetEntityAsMissionEntity(pVehicle, true, true)
 					DeleteEntity(pVehicle)
-					if (DoesEntityExist(pVehicle)) then
-						DeleteEntity(pVehicle)
-					end
-					Wait(1000)
-					local chance = math.random(1, 20)
-					if chance == 10 then
-						TriggerServerEvent('cad-chopshop:recievereward', "rare1")
-					end
-					local RareValue = math.random(1, 1000)
-					if RareValue == 500 then
-						TriggerServerEvent('cad-chopshop:recievereward', "rare2")
-					end
-					TriggerServerEvent('cad-chopshop:recievereward', "normal")
+					if DoesEntityExist(pVehicle) then DeleteEntity(pVehicle) end
 					QBCore.Functions.Notify('The vehicle has been chopped', 'error')
 					TriggerServerEvent('cad-chopshop:vehicleChopped')
+					Wait(1000)
+					local chance = math.random()
+					if chance < 0.15 then
+						TriggerServerEvent('cad-chopshop:recievereward', "rare1")
+					elseif chance > 0.85 then
+						TriggerServerEvent('cad-chopshop:recievereward', "rare2")
+					else
+						TriggerServerEvent('cad-chopshop:recievereward', "normal")
+					end
 					HotVehPlate = nil
 					HotVehModel = nil
 				else
