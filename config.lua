@@ -2,6 +2,8 @@ Config = {}
 
 Config.ChopRadioItem = "chopradio"
 
+Config.Inventory = 'qb' -- 'oldqb' or 'qb'
+
 Config.ChopShopPeds = {
     vector4(2342.21, 3055.63, 48.15, 162.86),
 }
