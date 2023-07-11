@@ -117,7 +117,7 @@ end)
 local function AddItem(player, item, amount)
     local src = player.PlayerData.source
     if Config.Inventory == 'qb' then
-        exports['qb-inventory']:AddItem(src, item, amount)
+        exports[Config.InventoryName]:AddItem(src, item, amount)
     else
         player.Functions.AddItem(item, amount)
     end
