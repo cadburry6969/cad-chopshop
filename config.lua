@@ -5,8 +5,13 @@ Config.ChopRadioItem = "chopradio"
 Config.Inventory = 'qb' -- 'oldqb' or 'qb'
 Config.InventoryName = 'qb-inventory' -- change this if you are using 'ps' or 'lj' or renamed you inventory folder
 
+Config.ChopShopPed = false
 Config.ChopShopPeds = {
-    vector4(2342.21, 3055.63, 48.15, 162.86),
+    {
+        model = `g_m_y_mexgoon_03`,
+        coords = vector4(2342.21, 3055.63, 47.15, 162.86),
+        scenario = 'WORLD_HUMAN_SMOKING'
+    }
 }
 Config.ChopShopLocations = {
     vector3(2340.49, 3052.32, 48.15),

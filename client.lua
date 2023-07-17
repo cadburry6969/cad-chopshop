@@ -41,9 +41,11 @@ RegisterNetEvent('cad-chopshop:informClients', function()
 end)
 
 RegisterNetEvent('cad-chopshop:HowToMsg', function()
-	QBCore.Functions.Notify("Bring the hot vehicle in front me and you will know.", 'success', 5000)
 	if chopTable then
+		QBCore.Functions.Notify("Bring the hot vehicle in front me and you will know.", 'success', 5000)
 		SetNewWaypoint(chopTable.x, chopTable.y)
+	else
+		QBCore.Functions.Notify("Get a chop radio and ill tel you what to do.", 'success', 5000)
 	end
 end)
 
@@ -64,15 +66,30 @@ end
 -- Threads
 
 CreateThread(function()
+if Config.ChopShopPed and Config.ChopShopPeds then
+	local function loadModel(model)
+		RequestModel(model)
+		while not HasModelLoaded(model) do
+			Wait(0)
+		end
+	end
+	local function loadAnim(dict)
+		RequestAnimDict(dict)
+		while not HasAnimDictLoaded(dict) do
+			Wait(50)
+		end
+	end
 	for _, data in pairs(ChopShopPed) do
-		exports['qb-target']:SpawnPed({
-			model = 'g_m_y_mexgoon_03',
-			coords = vector4(data.x, data.y, data.z, data.w),
-			minusOne = true,
-			freeze = true,
-			invincible = true,
-			blockevents = true,
-			scenario = 'WORLD_HUMAN_SMOKING',
+		loadModel(data.model)
+		local entity = CreatePed(0, data.model, data.coords.x, data.coords.y, data.coords.z, data.coords.w, true, false)
+		FreezeEntityPosition(entity, true)
+		SetBlockingOfNonTemporaryEvents(entity, true)
+		if data.animDict and data.animName then
+			loadAnim(data.animDict)
+			TaskPlayAnim(entity, data.animDict, data.animName, 8.0, 0, -1, 1, 0, 0, 0)
+		end
+		if data.scenario then TaskStartScenarioInPlace(entity, data.scenario, 0, true) end
+		exports['qb-target']:AddTargetEntity(entity, {
 			options = {
 				{
 					type = "client",
@@ -81,10 +98,10 @@ CreateThread(function()
 					label = 'Chopshop'
 				}
 			},
-			spawnNow = true,
 			distance = 1.5,
 		})
 	end
+end
 end)
 
 CreateThread(function()
@@ -165,7 +182,7 @@ CreateThread(function()
 			end
 		end
 		if not inRange then
-			Wait(1000) --  1secs
+			Wait(1000)
 		end
 	end
 end)
