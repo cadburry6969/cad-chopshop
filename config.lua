@@ -1,11 +1,13 @@
 Config = {}
 
-Config.ChopRadioItem = "chopradio"
+Config.Framework = 'qb' -- 'qb', 'esx'
 
-Config.Inventory = 'qb' -- 'oldqb' or 'qb'
-Config.InventoryName = 'qb-inventory' -- change this if you are using 'ps' or 'lj' or renamed you inventory folder
+Config.Inventory = 'ox_inventory' -- 'qb-inventory', 'lj-inventory', 'ps-inventory', 'ox_inventory'
+
+Config.Target = 'ox_target' -- 'qb-target', 'ox_target'
 
 Config.ChopShopPed = false
+
 Config.ChopShopPeds = {
     {
         model = `g_m_y_mexgoon_03`,
@@ -13,30 +15,36 @@ Config.ChopShopPeds = {
         scenario = 'WORLD_HUMAN_SMOKING'
     }
 }
+
 Config.ChopShopLocations = {
     vector3(2340.49, 3052.32, 48.15),
 }
 
+Config.MoneyType = 'cash' -- 'cash', 'dirtymoney'
+Config.MoneyReward = { 3500, 6500 }
+
 Config.RewardItems = {
-    "metalscrap",
-    "plastic",
-    "copper",
-    "iron",
-    "aluminum",
-    "steel",
-    "glass",
+    { item = "metalscrap", amount = { 20, 50 } },
+    { item = "plastic", amount = { 20, 50 } },
+    { item = "copper", amount = { 20, 50 } },
+    { item = "iron", amount = { 20, 50 } },
+    { item = "aluminum", amount = { 20, 50 } },
+    { item = "steel", amount = { 20, 50 } },
+    { item = "glass", amount = { 20, 50 } }
 }
 
 Config.Cooldown = 20
 
-Config.RandomVehicles = { "fugitive", "surge", "sultan", "asea", "premier", "baller", "blista", "panto", "prairie",
+Config.Vehicles= {
+    "fugitive", "surge", "sultan", "asea", "premier", "baller", "blista", "panto", "prairie",
     "rhapsody", "cogcabrio", "felon", "oracle", "sentinel", "blade", "buccaneer", "chino", "dominator", "dukes",
     "faction", "gauntlet", "moonbeam", "ratloader", "stalion", "tampa", "voodoo", "sandking", "rancherxl", "xls",
     "rocoto", "serrano", "cognoscenti", "emperor", "ingot", "regina", "surge", "primo", "comet", "carbonizzare",
     "banshee", "coquette", "futo", "jester", "massacro", "ninef", "schafter", "adder", "infernus", "voltic", "vacca",
-    "sadler", "bison" }
+    "sadler", "bison"
+}
 
-Config.RandomLocations = {
+Config.Locations = {
     vector4( -2480.9, -212.0, 17.4, 90.0),
     vector4( -2723.4, 13.2, 15.1, 90.0),
     vector4( -3169.6, 976.2, 15.0, 90.0),
