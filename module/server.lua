@@ -60,11 +60,12 @@ CreateThread(function()
                 randomVeh = Config.Vehicles[math.random(1, #Config.Vehicles)]
                 inProgress = true
                 Wait(1000)
-                local nativeHash = GetHashKey("CREATE_AUTOMOBILE")
-                chopvehicle = Citizen.InvokeNative(nativeHash, GetHashKey(randomVeh), randomLoc.x, randomLoc.y, randomLoc.z, randomLoc.w, true, true)
+                local model = GetHashKey(randomVeh)
+                chopvehicle = CreateVehicle(model, randomLoc.x, randomLoc.y, randomLoc.z, randomLoc.w, true, false)
                 while not DoesEntityExist(chopvehicle) do Wait(0) end
                 currentplate = GetPlate(chopvehicle)
                 Wait(100)
+                SetEntityHeading(chopvehicle, randomLoc.w)
                 SetVehicleDoorsLocked(chopvehicle, 2)
                 print(tostring("Vehicle: " .. randomVeh .. " | Coords: " .. randomLoc .. " | Plate: " .. currentplate))
                 local Players = GetAllPlayers()
