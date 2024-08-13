@@ -4,10 +4,11 @@ Chopshop with radio which provides you hotvehicle on time to time. just have rad
 
 [Video](https://youtu.be/I0GqpBkloK0)
 
-# Dependencies
+# Supported
 
-* qb-core
-* qb-target
+Framework:  qb, esx
+Target: qb-target, ox_target
+Inventory: qb-inventory, lj-inventory, ps-inventory, ox_inventory
 
 # How to Install
 
