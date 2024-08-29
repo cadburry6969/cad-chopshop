@@ -152,9 +152,8 @@ CreateThread(function()
 					DeleteEntity(pVehicle)
 					if DoesEntityExist(pVehicle) then DeleteEntity(pVehicle) end
 					Wait(math.random(500, 2000))
-					TriggerServerEvent('cad-chopshop:reward')
-					Notify('The vehicle has been chopped', 'error')
 					TriggerServerEvent('cad-chopshop:vehicleChopped')
+					Notify('The vehicle has been chopped', 'error')
 					HotVehPlate = nil
 					HotVehModel = nil
 				else

@@ -13,6 +13,10 @@ local currentplate = nil
 
 -- Functions
 
+function IsValid()
+    return randomLoc and randomVeh and currentplate
+end
+
 function GetPlate(entity)
     local value = GetVehicleNumberPlateText(entity)
     if not value then return nil end
@@ -47,6 +51,20 @@ function IsNearChopLocation(source)
         end
     end
     return false
+end
+
+function InformClients()
+    local Players = GetAllPlayers()
+    for i = 1, #Players, 1 do
+        local _src = Players[i]
+        if HasItem(_src, "chopradio") then
+            TriggerClientEvent('cad-chopshop:informClients', _src)
+        end
+    end
+    randomLoc = nil
+    randomVeh = nil
+    currentplate = nil
+    chopvehicle = nil
 end
 
 -- Loops
@@ -85,7 +103,7 @@ end)
 
 function UseItem(source)
     local src = source
-    if randomLoc and randomVeh and currentplate then
+    if IsValid() then
         TriggerClientEvent('cad-chopshop:notifyOwner', src, randomLoc.x, randomLoc.y, randomLoc.z, randomVeh, currentplate)
     else
         Notify(src, 'You will be informed if there is another hot vehicle needed')
@@ -96,53 +114,28 @@ end
 
 RegisterNetEvent('cad-chopshop:playerLoaded', function(source)
     Wait(2000)
-    if HasItem(source, "chopradio") then
-        if randomLoc and randomVeh and currentplate then
+    if IsValid() then
+        if HasItem(source, "chopradio") then
             TriggerClientEvent('cad-chopshop:notifyOwner', source, randomLoc.x, randomLoc.y, randomLoc.z, randomVeh, currentplate)
         end
     end
 end)
 
 RegisterNetEvent('cad-chopshop:vehicleChopped', function()
-    local Players = GetAllPlayers()
-    for i = 1, #Players, 1 do
-        local source = Players[i]
-        if HasItem(source, "chopradio") then
-            TriggerClientEvent('cad-chopshop:informClients', source)
-        end
-    end
-    randomLoc = nil
-    randomVeh = nil
-    currentplate = nil
-    chopvehicle = nil
-end)
-
-RegisterNetEvent('cad-chopshop:timeOver', function()
-    local Players = GetAllPlayers()
-    for i = 1, #Players, 1 do
-        local source = Players[i]
-        if HasItem(source, "chopradio") then
-            TriggerClientEvent('cad-chopshop:informClients', source)
-        end
-    end
-    randomLoc = nil
-    randomVeh = nil
-    currentplate = nil
-    chopvehicle = nil
-end)
-
-RegisterNetEvent('cad-chopshop:reward', function()
     local src = source
     local Player = GetPlayer(src)
     if not Player then return end
-    if randomLoc and randomVeh and currentplate and IsNearChopLocation(src) then
+    if IsValid() and IsNearChopLocation(src) then
         local amount = math.random(Config.MoneyReward[1], Config.MoneyReward[2])
         Player.AddMoney(amount)
         for i = 1, math.random(3, 6), 1 do
             local data = Config.RewardItems[math.random(1, #Config.RewardItems)]
             AddItem(Player.source, data.item, math.random(data.amount[1], data.amount[2]))
         end
+        InformClients()
     else
         DropPlayer(src, 'Chop Reward Exploit')
     end
 end)
+
+RegisterNetEvent('cad-chopshop:timeOver', InformClients)
