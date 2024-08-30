@@ -31,13 +31,13 @@ function CooldownTimer(minutes)
         if cooldown <= 0 then
             cooldown = -1
             inProgress = false
-            TriggerEvent('cad-chopshop:timeOver')
+            InformClients()
             break
         end
         if chopvehicle and not DoesEntityExist(chopvehicle) then
             cooldown = -1
             inProgress = false
-            TriggerEvent('cad-chopshop:timeOver')
+            InformClients()
             break
         end
     end
@@ -51,6 +51,12 @@ function IsNearChopLocation(source)
         end
     end
     return false
+end
+
+function DeleteChopVehicle(src)
+    local vehicle = GetVehiclePedIsIn(GetPlayerPed(src), false)
+    if vehicle then DeleteEntity(vehicle) end
+    if chopvehicle and DoesEntityExist(chopvehicle) then DeleteEntity(chopvehicle) end
 end
 
 function InformClients()
@@ -126,6 +132,7 @@ RegisterNetEvent('cad-chopshop:vehicleChopped', function()
     local Player = GetPlayer(src)
     if not Player then return end
     if IsValid() and IsNearChopLocation(src) then
+        DeleteChopVehicle(src)
         local amount = math.random(Config.MoneyReward[1], Config.MoneyReward[2])
         Player.AddMoney(amount)
         for i = 1, math.random(3, 6), 1 do
@@ -137,5 +144,3 @@ RegisterNetEvent('cad-chopshop:vehicleChopped', function()
         DropPlayer(src, 'Chop Reward Exploit')
     end
 end)
-
-RegisterNetEvent('cad-chopshop:timeOver', InformClients)

@@ -149,13 +149,12 @@ CreateThread(function()
 					PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
 					SetVehicleDoorBroken(pVehicle, 5, false)
 					SetEntityAsMissionEntity(pVehicle, true, true)
-					DeleteEntity(pVehicle)
-					if DoesEntityExist(pVehicle) then DeleteEntity(pVehicle) end
-					Wait(math.random(500, 2000))
-					TriggerServerEvent('cad-chopshop:vehicleChopped')
 					Notify('The vehicle has been chopped', 'error')
 					HotVehPlate = nil
 					HotVehModel = nil
+					SetTimeout(math.random(500, 2000), function()
+						TriggerServerEvent('cad-chopshop:vehicleChopped')
+					end)
 				else
 					Notify('This is not the hot vehicle', 'error')
 				end
