@@ -22,13 +22,13 @@ end
 RegisterNetEvent('cad-chopshop:notifyOwner', function(x, y, z, randomVeh, currentplate)
 	HotVehModel = randomVeh
 	HotVehPlate = currentplate
-	local streetName, crossingRoad = GetStreetNameAtCoord(x, y, z)
-	local street = string.format('%s - %s', GetStreetNameFromHashKey(streetName), GetStreetNameFromHashKey(crossingRoad))
-	local zone = GetLabelText(GetNameOfZone(x, y, z))
+	local name, crossing = GetStreetNameAtCoord(x, y, z, Citizen.ResultAsInteger(), Citizen.ResultAsInteger())
+	local streetName = string.format('%s - %s', GetStreetNameFromHashKey(name), GetStreetNameFromHashKey(crossing))
+	local zoneName = GetLabelText(GetNameOfZone(x, y, z))
 	chopTable = vector2(x, y)
 	PlaySoundFrontend(-1, "Event_Message_Purple", "GTAO_FM_Events_Soundset", 1)
 	randomVeh = randomVeh:gsub("^%l", string.upper)
-	ChatMessage("Hot vehicle " .. randomVeh .. " available at " .. zone .. " on " .. street .. " with plate number: " .. HotVehPlate)
+	ChatMessage("Hot vehicle " .. randomVeh .. " available at " .. streetName .. " on " .. zoneName .. " with plate number: " .. HotVehPlate)
 end)
 
 RegisterNetEvent('cad-chopshop:informClients', function()
