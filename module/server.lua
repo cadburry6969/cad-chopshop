@@ -78,7 +78,7 @@ end
 CreateThread(function()
     while true do
         Wait(5000)
-        if not inProgress then
+        if not inProgress and #GetAllPlayers() > 0 then
             if randomLoc == nil and randomVeh == nil and currentplate == nil then
                 randomLoc = Config.Locations[math.random(1, #Config.Locations)]
                 randomVeh = Config.Vehicles[math.random(1, #Config.Vehicles)]
