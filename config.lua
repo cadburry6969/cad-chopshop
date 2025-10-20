@@ -1,6 +1,8 @@
 Config = {}
 
-Config.Framework = 'qb' -- 'qb', 'esx'
+Config.Debug = true
+
+Config.Framework = 'qb' -- 'qbox', 'qb', 'esx'
 
 Config.Inventory = 'ox_inventory' -- 'qb-inventory', 'lj-inventory', 'ps-inventory', 'ox_inventory'
 
@@ -18,30 +20,42 @@ Config.ChopShopPeds = {
 
 Config.ChopShopLocations = {
     vector3(2340.49, 3052.32, 48.15),
+    vector3(-177.8888, 6253.0923, 31.4895),
+    vector3(-1170.0183, -2037.2954, 13.6203),
 }
 
 Config.MoneyType = 'cash' -- 'cash', 'dirtymoney'
-Config.MoneyReward = { 3500, 6500 }
+Config.MoneyReward = { 200, 300 }
+-- Money Multiplier based on players in server 
+Config.MoneyRewardMultiplier = 1.1 -- (multiplier x no. of players) * money
 
 Config.RewardItems = {
-    { item = "metalscrap", amount = { 20, 50 } },
-    { item = "plastic", amount = { 20, 50 } },
-    { item = "copper", amount = { 20, 50 } },
-    { item = "iron", amount = { 20, 50 } },
-    { item = "aluminum", amount = { 20, 50 } },
-    { item = "steel", amount = { 20, 50 } },
-    { item = "glass", amount = { 20, 50 } }
+    { item = "metalscrap", amount = { 2, 3 } },
+    { item = "plastic", amount = { 2, 3 } },
+    { item = "copper", amount = { 2, 3 } },
+    { item = "iron", amount = { 2, 3 } },
+    { item = "aluminum", amount = { 2, 3 } },
+    { item = "aluminium", amount = { 2, 3 } },
+    { item = "steel", amount = { 2, 3 } },
+    { item = "glass", amount = { 2, 3 } },
+    { item = "rubber", amount = { 2, 3 } },
 }
+-- Item Amount Multiplier based on players in server 
+Config.RewardItemsMultiplier = 1.1 -- (multiplier x no. of players) * item_count
 
-Config.Cooldown = 20
+Config.VehicleSpawnTimeout = 5 -- seconds
+
+Config.AssignVehicleCooldown = 20 -- minutes
+
+Config.ChoppedVehicleCooldown = 5 -- minutes
 
 Config.Vehicles= {
-    "fugitive", "surge", "sultan", "asea", "premier", "baller", "blista", "panto", "prairie",
-    "rhapsody", "cogcabrio", "felon", "oracle", "sentinel", "blade", "buccaneer", "chino", "dominator", "dukes",
-    "faction", "gauntlet", "moonbeam", "ratloader", "stalion", "tampa", "voodoo", "sandking", "rancherxl", "xls",
-    "rocoto", "serrano", "cognoscenti", "emperor", "ingot", "regina", "surge", "primo", "comet", "carbonizzare",
-    "banshee", "coquette", "futo", "jester", "massacro", "ninef", "schafter", "adder", "infernus", "voltic", "vacca",
-    "sadler", "bison"
+    `fugitive`, `surge`, `sultan`, `asea`, `premier`, `baller`, `blista`, `panto`, `prairie`,
+    `rhapsody`, `cogcabrio`, `felon`, `oracle`, `sentinel`, `blade`, `buccaneer`, `chino`, `dominator`, `dukes`,
+    `faction`, `gauntlet`, `moonbeam`, `ratloader`, `stalion`, `tampa`, `voodoo`, `sandking`, `rancherxl`, `xls`,
+    `rocoto`, `serrano`, `cognoscenti`, `emperor`, `ingot`, `regina`, `surge`, `primo`, `comet`, `carbonizzare`,
+    `banshee`, `coquette`, `futo`, `jester`, `massacro`, `ninef`, `schafter`, `adder`, `infernus`, `voltic`, `vacca`,
+    `sadler`, `bison`
 }
 
 Config.Locations = {

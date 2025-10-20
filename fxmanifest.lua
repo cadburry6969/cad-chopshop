@@ -4,9 +4,10 @@ lua54 'yes'
 
 author "Cadburry (ByteCode Studios)"
 description "ChopShop with radio which provides hot vehicles"
-version "1.2"
+version "1.3"
 
 shared_scripts {
+    "@ox_lib/init.lua",
     "config.lua"
 }
 

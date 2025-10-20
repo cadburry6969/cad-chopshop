@@ -5,163 +5,154 @@ end
 
 -- Locals
 
-local HotVehPlate = nil
-local HotVehModel = nil
-local chopTable = nil
+local blips = {}
 
 -- Functions
 
-function GetPlate(entity)
+local function getPlate(entity)
     local value = GetVehicleNumberPlateText(entity)
     if not value then return nil end
     return (string.gsub(value, '^%s*(.-)%s*$', '%1'))
 end
 
--- Events
-
-RegisterNetEvent('cad-chopshop:notifyOwner', function(x, y, z, randomVeh, currentplate)
-	HotVehModel = randomVeh
-	HotVehPlate = currentplate
-	local streetName, crossingRoad = GetStreetNameAtCoord(x, y, z)
-	local street = string.format('%s - %s', GetStreetNameFromHashKey(streetName), GetStreetNameFromHashKey(crossingRoad))
-	local zone = GetLabelText(GetNameOfZone(x, y, z))
-	chopTable = vector2(x, y)
+local function notifyPlayerStart(value)
+	if not value then return end
+	local coords = value.coords
+	local vehPlate = value.plate
+	local vehModel = GetDisplayNameFromVehicleModel(value.model)
+	local name, crossing = GetStreetNameAtCoord(coords.x, coords.y, coords.z, Citizen.ResultAsInteger(), Citizen.ResultAsInteger())
+	local streetName = string.format('%s - %s', GetStreetNameFromHashKey(name), GetStreetNameFromHashKey(crossing))
+	local zoneName = GetLabelText(GetNameOfZone(coords.x, coords.y, coords.z))
 	PlaySoundFrontend(-1, "Event_Message_Purple", "GTAO_FM_Events_Soundset", 1)
-	randomVeh = randomVeh:gsub("^%l", string.upper)
-	ChatMessage("Hot vehicle " .. randomVeh .. " available at " .. zone .. " on " .. street .. " with plate number: " .. HotVehPlate)
-end)
+	vehModel = vehModel:gsub("^%l", string.upper)
+	ChatMessage("Hot vehicle " .. vehModel .. " available at " .. streetName .. " on " .. zoneName .. " with plate number: " .. vehPlate)
+end
 
-RegisterNetEvent('cad-chopshop:informClients', function()
-	HotVehPlate = nil
-	HotVehModel = nil
+local function notifyPlayerEnd()
 	PlaySoundFrontend(-1, "Event_Message_Purple", "GTAO_FM_Events_Soundset", 1)
 	ChatMessage("The hot vehicle is no longer needed. Wait for another hot vehicle")
-end)
+end
 
-RegisterNetEvent('cad-chopshop:HowToMsg', function()
-	if chopTable then
-		Notify("Bring the hot vehicle in front me and you will know.", 'success', 5000)
-		SetNewWaypoint(chopTable.x, chopTable.y)
+local function notifyHandler(value)
+	if value and value.entity and value.coords and value.model and value.plate then
+		notifyPlayerStart(value)
 	else
-		Notify("Get a chop radio and ill tel you what to do.", 'success', 5000)
-	end
-end)
-
--- Functions
-
-function ShowHelpNotification(msg, thisFrame, beep, duration)
-	AddTextEntry('CadHelpNotification', msg)
-
-	if thisFrame then
-		DisplayHelpTextThisFrame('CadHelpNotification', false)
-	else
-		if beep == nil then beep = true end
-		BeginTextCommandDisplayHelp('CadHelpNotification')
-		EndTextCommandDisplayHelp(0, false, beep, duration or -1)
+		notifyPlayerEnd()
 	end
 end
+
+-- State bags
+
+AddStateBagChangeHandler('ChopShop', 'global', function(bagName, key, value, _reserved, replicated)
+	if not HasItem('chopradio') then return end
+	notifyHandler(value)
+end)
+
+-- Events
+
+RegisterNetEvent('cad-chopshop:informClients', notifyPlayerStart)
+
+RegisterNetEvent('cad-chopshop:toggleBlip', function(toggle)
+	if toggle then
+		notifyHandler(GlobalState.ChopShop)
+		for _, coord in pairs(Config.ChopShopLocations) do
+			local blip = AddBlipForCoord(coord.x, coord.y, coord.z)
+			SetBlipAsShortRange(blip, true)
+			SetBlipSprite(blip, 665)
+			SetBlipColour(blip, 51)
+			SetBlipScale(blip, 1.5)
+			SetBlipDisplay(blip, 6)
+			BeginTextCommandSetBlipName('STRING')
+			AddTextComponentSubstringPlayerName('Vehicle Dump Yard')
+			EndTextCommandSetBlipName(blip)
+			blips[#blips+1] = blip
+		end
+	else
+		for _, blip in pairs(blips) do
+			if DoesBlipExist(blip) then
+				RemoveBlip(blip)
+			end
+		end
+	end
+end)
 
 -- Threads
 
 CreateThread(function()
-if Config.ChopShopPed and Config.ChopShopPeds then
-	local function loadModel(model)
-		RequestModel(model)
-		while not HasModelLoaded(model) do
-			Wait(0)
+	for _, coord in pairs(Config.ChopShopLocations) do
+		local point = lib.points.new({
+			coords = vec3(coord.x, coord.y, coord.z),
+			distance = 5
+		})
+		function point:onEnter()
+			if not cache.vehicle then return end
+			if cache.seat ~= -1 then return end
+			lib.showTextUI('Press [E] chop vehicle')
 		end
-	end
-	local function loadAnim(dict)
-		RequestAnimDict(dict)
-		while not HasAnimDictLoaded(dict) do
-			Wait(50)
+		function point:onExit()
+			lib.hideTextUI()
 		end
-	end
-	for _, data in pairs(Config.ChopShopPeds) do
-		loadModel(data.model)
-		local entity = CreatePed(0, data.model, data.coords.x, data.coords.y, data.coords.z, data.coords.w, true, false)
-		FreezeEntityPosition(entity, true)
-		SetBlockingOfNonTemporaryEvents(entity, true)
-		if data.animDict and data.animName then
-			loadAnim(data.animDict)
-			TaskPlayAnim(entity, data.animDict, data.animName, 8.0, 0, -1, 1, 0, 0, 0)
-		end
-		if data.scenario then TaskStartScenarioInPlace(entity, data.scenario, 0, true) end
-		AddTargetEntity(entity)
-	end
-end
-end)
-
-CreateThread(function()
-	while true do
-		Wait(0)
-		local inRange = false
-		local pPed = PlayerPedId()
-		local plyCoords = GetEntityCoords(pPed)
-		local isInChopRange = false
-		for _, coord in pairs(Config.ChopShopLocations) do
-			local distance = #(plyCoords-vector3(coord.x, coord.y, coord.z))
-			if distance < 4 then
-				if IsPedInAnyVehicle(pPed, true) then
-					isInChopRange = true
-					inRange = true
-				end
-			end
-		end
-		if isInChopRange then
-			local pVehicle = GetVehiclePedIsIn(pPed, false)
-			local pSeat = (GetPedInVehicleSeat(pVehicle, -1) == pPed)
-			local pVehModel = GetDisplayNameFromVehicleModel(GetEntityModel(pVehicle))
-			local pPlate = GetPlate(pVehicle)
-			ShowHelpNotification("Press ~INPUT_CONTEXT~ to chop the vehicle", true, true, 10000)
-			if IsControlJustReleased(0, 46) and pSeat then
-				if (pPlate == HotVehPlate) or (pVehModel:lower() == HotVehModel) then
-					SetVehicleDoorsLocked(pVehicle, 2)
-					SetVehicleEngineOn(pVehicle, false, false, true)
-					SetVehicleUndriveable(pVehicle, false)
-					SetVehicleDoorOpen(pVehicle, 0, false, true)
-					Wait(1000)
-					PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
-					SetVehicleDoorBroken(pVehicle, 0, false)
-					Wait(1000)
-					SetVehicleDoorOpen(pVehicle, 1, false, true)
-					Wait(1000)
-					PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
-					SetVehicleDoorBroken(pVehicle, 1, false)
-					Wait(1000)
-					SetVehicleDoorOpen(pVehicle, 2, false, true)
-					Wait(1000)
-					PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
-					SetVehicleDoorBroken(pVehicle, 2, false)
-					Wait(1000)
-					SetVehicleDoorOpen(pVehicle, 3, false, true)
-					Wait(1000)
-					PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
-					SetVehicleDoorBroken(pVehicle, 3, false)
-					Wait(1000)
-					SetVehicleDoorOpen(pVehicle, 4, false, true)
-					Wait(1000)
-					PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
-					SetVehicleDoorBroken(pVehicle, 4, false)
-					Wait(1000)
-					SetVehicleDoorOpen(pVehicle, 5, false, true)
-					Wait(1000)
-					PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
-					SetVehicleDoorBroken(pVehicle, 5, false)
-					SetEntityAsMissionEntity(pVehicle, true, true)
-					Notify('The vehicle has been chopped', 'error')
-					HotVehPlate = nil
-					HotVehModel = nil
-					SetTimeout(math.random(500, 2000), function()
+		function point:nearby()
+			if IsControlJustReleased(0, 46) and cache.vehicle and (cache.seat == -1) then
+				local success = lib.progressBar({
+					duration = math.random(4000, 10000),
+					label = 'Chopping vehicle...',
+					useWhileDead = false,
+					canCancel = false,
+					disable = {
+						car = true,
+						move = true,
+					},
+				})
+				local data = GlobalState.ChopShop
+				if data and success then
+					local currentVehModel = GetDisplayNameFromVehicleModel(GetEntityModel(cache.vehicle)):lower()
+					local vehModel = GetDisplayNameFromVehicleModel(data.model)
+					local vehPlate = getPlate(cache.vehicle)
+					if (vehPlate == data.plate) or (currentVehModel == vehModel) then
+						SetVehicleDoorsLocked(cache.vehicle, 2)
+						SetVehicleEngineOn(cache.vehicle, false, false, true)
+						SetVehicleUndriveable(cache.vehicle, false)
+						SetVehicleDoorOpen(cache.vehicle, 0, false, true)
+						Wait(1000)
+						PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
+						SetVehicleDoorBroken(cache.vehicle, 0, false)
+						Wait(1000)
+						SetVehicleDoorOpen(cache.vehicle, 1, false, true)
+						Wait(1000)
+						PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
+						SetVehicleDoorBroken(cache.vehicle, 1, false)
+						Wait(1000)
+						SetVehicleDoorOpen(cache.vehicle, 2, false, true)
+						Wait(1000)
+						PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
+						SetVehicleDoorBroken(cache.vehicle, 2, false)
+						Wait(1000)
+						SetVehicleDoorOpen(cache.vehicle, 3, false, true)
+						Wait(1000)
+						PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
+						SetVehicleDoorBroken(cache.vehicle, 3, false)
+						Wait(1000)
+						SetVehicleDoorOpen(cache.vehicle, 4, false, true)
+						Wait(1000)
+						PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
+						SetVehicleDoorBroken(cache.vehicle, 4, false)
+						Wait(1000)
+						SetVehicleDoorOpen(cache.vehicle, 5, false, true)
+						Wait(1000)
+						PlaySoundFrontend(-1, "Cut_Final_Bar", "DLC_H4_Underwater_Blowtorch_Sounds", 1)
+						SetVehicleDoorBroken(cache.vehicle, 5, false)
+						SetEntityAsMissionEntity(cache.vehicle, true, true)
+						TaskLeaveVehicle(cache.ped, cache.vehicle, 256)
 						TriggerServerEvent('cad-chopshop:vehicleChopped')
-					end)
+						Notify('The vehicle has been chopped', 'error')
+					else
+						Notify('This is not the hot vehicle', 'error')
+					end
 				else
-					Notify('This is not the hot vehicle', 'error')
+					Notify('This vehicle cannot be chopped', 'error')
 				end
 			end
-		end
-		if not inRange then
-			Wait(1000)
 		end
 	end
 end)
